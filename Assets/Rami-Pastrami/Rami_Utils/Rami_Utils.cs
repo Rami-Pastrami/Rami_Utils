@@ -1,9 +1,13 @@
 ﻿// Created by Rami-Pastrami
 // Just some common functions used in my various projects
 
+// Uncomment to enable safety warnings, useful for debugging. This should be commented out before release for performance reasons
+//#define DEBUG
 
 using System;
+using System.Linq;
 using UnityEngine;
+
 
 namespace Rami.Utils
 {
@@ -71,9 +75,9 @@ namespace Rami.Utils
         #endregion
 
         //////////////////////////////////////////////////////////
-        /////////////////// Stupid Conversions ///////////////////
+        /////////////////////// Array Jank ///////////////////////
         //////////////////////////////////////////////////////////
-        #region Stupid Conversions
+        #region Array Jank
         // Can't wait for VRC to add a lot of array stuff natively
 
 
@@ -92,8 +96,102 @@ namespace Rami.Utils
             }
             return string.Join(", ", strArr);
         }
-        
 
+        /// <summary>
+        /// Converts a Vector2 to a float array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>2 long float array</returns>
+        static public float[] Vector22FloatArr(Vector2 input) { return new float[] { input.x, input.y}; }
+
+        /// <summary>
+        /// Converts a Vector3 to a float array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>3 long float array</returns>
+        static public float[] Vector32FloatArr(Vector3 input) { return new float[] { input.x, input.y, input.z }; }
+
+        /// <summary>
+        /// Converts a Vector4 to a float array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>4 long float array</returns>
+        static public float[] Vector42FloatArr(Vector4 input) { return new float[] { input.x, input.y, input.z, input.w }; }
+
+        /// <summary>
+        /// Converts an array of Vector2s into a 1D float array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>1D float array</returns>
+        static public float[] Vector2Arr2FloatArr(Vector2[] input)
+        {
+            float[] output = new float[input.Length * 2];
+            for (int i = 0; i < input.Length; ++i)
+            {
+                output[i] = input[i].x;
+                output[i + 1] = input[i].y;
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Converts an array of Vector3s into a 1D float array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>1D float array</returns>
+        static public float[] Vector3Arr2FloatArr(Vector3[] input)
+        {
+            float[] output = new float[input.Length * 3];
+            for (int i = 0; i < input.Length; ++i)
+            {
+                output[i] = input[i].x;
+                output[i + 1] = input[i].y;
+                output[i + 2] = input[i].z;
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Converts an array of Vector4s into a 1D float array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>1D float array</returns>
+        static public float[] Vector4Arr2FloatArr(Vector4[] input)
+        {
+            float[] output = new float[input.Length * 4];
+            for (int i = 0; i < input.Length; ++i)
+            {
+                output[i] = input[i].x;
+                output[i + 1] = input[i].y;
+                output[i + 2] = input[i].z;
+                output[i + 3] = input[i].w;
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Write a subarray onto a parent array, overwriting previous values, starting from a specific (parent) index
+        /// </summary>
+        /// <param name="subArray"></param>
+        /// <param name="parentArray"></param>
+        /// <param name="index"></param>
+        /// <returns>Altered parent array</returns>
+        static public float[] WriteSubArrayOverArray(float[] subArray, float[] parentArray, int index)
+        {
+            #if DEBUG
+            if( subArray.Length + index > parentArray.Length)
+            {
+                //Only log a warning instead of an error so we cause a more useful error instead of stopping beforehand
+                Debug.LogWarning("Rami_Utils DEBUG - WriteSubArrayOverArray - index and subArray lengths are greater than parentArray length, this WILL cause an error");
+            }
+            #endif
+
+            for (int i = 0; i < subArray.Length; ++i)
+            {
+                parentArray[i + index] = subArray[i];
+            }
+            return parentArray;
+        }
 
 
         #endregion
