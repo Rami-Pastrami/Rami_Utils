@@ -9,7 +9,7 @@ using System.Linq;
 using UnityEngine;
 
 
-namespace Rami.Utils
+namespace Rami
 {
     public static class Rami_Utils
     {
@@ -90,7 +90,7 @@ namespace Rami.Utils
         static public string Array2CSV<TYPE>(TYPE[] array)
         {
             string[] strArr = new string[array.Length];
-            for(int i = 0; i < array.Length; ++i)
+            for (int i = 0; i < array.Length; ++i)
             {
                 strArr[i] = array[i].ToString();
             }
@@ -98,11 +98,77 @@ namespace Rami.Utils
         }
 
         /// <summary>
+        /// Write a subarray onto a parent array, overwriting previous values, starting from a specific (parent) index
+        /// </summary>
+        /// <typeparam name="TYPE">The element type that the array contains</typeparam>
+        /// <param name="subArray"></param>
+        /// <param name="parentArray"></param>
+        /// <param name="index"></param>
+        /// <returns>Altered parent array</returns>
+        static public TYPE[] WriteSubArrayOverArray<TYPE>(TYPE[] subArray, TYPE[] parentArray, int index)
+        {
+#if DEBUG
+            if (subArray.Length + index > parentArray.Length)
+            {
+                //Only log a warning instead of an error so we cause a more useful error instead of stopping beforehand
+                Debug.LogWarning("Rami_Utils DEBUG - WriteSubArrayOverArray - index and subArray lengths are greater than parentArray length, this WILL cause an error");
+            }
+#endif
+
+            for (int i = 0; i < subArray.Length; ++i)
+            {
+                parentArray[i + index] = subArray[i];
+            }
+            return parentArray;
+        }
+
+        /// <summary>
+        /// returns SubArray from parent array, given start and end indexes
+        /// </summary>
+        /// <typeparam name="TYPE">The element type that the array contains</typeparam>
+        /// <param name="parentArray"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns>Subarray of TYPE</returns>
+        static public TYPE[] GetSubArrayFromArray_StartEnd<TYPE>(TYPE[] parentArray, int startIndex, int endIndex)
+        {
+#if DEBUG
+            if ((startIndex < 0) | (endIndex > parentArray.Length))
+            {
+                Debug.LogWarning("Rami_Utils DEBUG - GetSubArrayFromArray_StartEnd - start/end values are invalid. this WILL cause an error");
+            }
+#endif
+
+            TYPE[] output = new TYPE[endIndex - startIndex];
+            int i = 0;
+            for (; startIndex < endIndex; ++startIndex)
+            {
+                output[i] = parentArray[startIndex];
+                i++;
+            }
+
+            return output;
+        }
+
+        /// <summary>
+        /// returns SubArray from parent array, given start and subarray size
+        /// </summary>
+        /// <typeparam name="TYPE">The element type that the array contains</typeparam>
+        /// <param name="parentArray"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="size"></param>
+        /// <returns>Subarray of TYPE</returns>
+        static public TYPE[] GetSubArrayFromArray_StartSize<TYPE>(TYPE[] parentArray, int startIndex, int size)
+        {
+            return GetSubArrayFromArray_StartEnd(parentArray, startIndex, startIndex + size);
+        }
+
+        /// <summary>
         /// Converts a Vector2 to a float array
         /// </summary>
         /// <param name="input"></param>
         /// <returns>2 long float array</returns>
-        static public float[] Vector22FloatArr(Vector2 input) { return new float[] { input.x, input.y}; }
+        static public float[] Vector22FloatArr(Vector2 input) { return new float[] { input.x, input.y }; }
 
         /// <summary>
         /// Converts a Vector3 to a float array
@@ -135,6 +201,22 @@ namespace Rami.Utils
         }
 
         /// <summary>
+        /// returns midpoint
+        /// </summary>
+        /// <param name="Vs"></param>
+        /// <returns></returns>
+        static public Vector2 CenterOfVector2s(Vector2[] Vs)
+        {
+            Vector2 output = Vector2.zero;
+            for (int i = 0; i < Vs.Length; ++i)
+            {
+                output += Vs[i];
+            }
+
+            return output / (float)Vs.Length;
+        }
+
+        /// <summary>
         /// Converts an array of Vector3s into a 1D float array
         /// </summary>
         /// <param name="input"></param>
@@ -149,6 +231,22 @@ namespace Rami.Utils
                 output[i + 2] = input[i].z;
             }
             return output;
+        }
+
+        /// <summary>
+        /// returns midpoint
+        /// </summary>
+        /// <param name="Vs"></param>
+        /// <returns></returns>
+        static public Vector3 CenterOfVector3s(Vector3[] Vs)
+        {
+            Vector3 output = Vector3.zero;
+            for (int i = 0; i < Vs.Length; ++i)
+            {
+                output += Vs[i];
+            }
+
+            return output / (float)Vs.Length;
         }
 
         /// <summary>
@@ -170,27 +268,65 @@ namespace Rami.Utils
         }
 
         /// <summary>
-        /// Write a subarray onto a parent array, overwriting previous values, starting from a specific (parent) index
+        /// returns midpoint
         /// </summary>
-        /// <param name="subArray"></param>
-        /// <param name="parentArray"></param>
-        /// <param name="index"></param>
-        /// <returns>Altered parent array</returns>
-        static public float[] WriteSubArrayOverArray(float[] subArray, float[] parentArray, int index)
+        /// <param name="Vs"></param>
+        /// <returns></returns>
+        static public Vector4 CenterOfVector4s(Vector4[] Vs)
         {
-            #if DEBUG
-            if( subArray.Length + index > parentArray.Length)
+            Vector4 output = Vector4.zero;
+            for (int i = 0; i < Vs.Length; ++i)
             {
-                //Only log a warning instead of an error so we cause a more useful error instead of stopping beforehand
-                Debug.LogWarning("Rami_Utils DEBUG - WriteSubArrayOverArray - index and subArray lengths are greater than parentArray length, this WILL cause an error");
+                output += Vs[i];
             }
-            #endif
 
-            for (int i = 0; i < subArray.Length; ++i)
+            return output / (float)Vs.Length;
+        }
+
+        /// <summary>
+        /// returns midpoint
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        static public Vector3 GetCenterOfTransforms(Transform[] trans)
+        {
+            Vector3 output = Vector3.zero;
+            for (int i = 0; i < trans.Length; i++)
             {
-                parentArray[i + index] = subArray[i];
+                output += trans[i].position;
             }
-            return parentArray;
+
+            return output / (float)trans.Length;
+        }
+
+        /// <summary>
+        /// Converts Transform Array into Position Vector3 Array
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        static public Vector3[] TransformArr2PosArr(Transform[] trans)
+        {
+            Vector3[] output = new Vector3[trans.Length];
+            for (int i = 0; i < trans.Length; ++i)
+            {
+                output[i] = trans[i].position;
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Converts Transform Array into Rotation Quaternion Array
+        /// </summary>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        static public Quaternion[] TransformArr2RotArr(Transform[] trans)
+        {
+            Quaternion[] output = new Quaternion[trans.Length];
+            for (int i = 0; i < trans.Length; ++i)
+            {
+                output[i] = trans[i].rotation;
+            }
+            return output;
         }
 
 
