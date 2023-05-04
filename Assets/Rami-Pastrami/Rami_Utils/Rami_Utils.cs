@@ -382,6 +382,34 @@ namespace Rami
         #endregion
 
         //////////////////////////////////////////////////////////
+        ////////////////////// Data Export ///////////////////////
+        //////////////////////////////////////////////////////////
+        #region DataExport
+
+        /// <summary>
+        /// A standardized way to export variables into the VRC log file
+        /// </summary>
+        /// <param name="variablename"> What you wish the variable to be titled </param>
+        /// <param name="data"> Data to export </param>
+        static public void ExportLogString( string variablename, string data)
+        {
+            Debug.Log($"RAMI_EXPORT:{variablename}|{data}");
+        }
+
+        /// <summary>
+        /// A standardized way to export array variables into the VRC log file
+        /// </summary>
+        /// <typeparam name="TYPE"></typeparam>
+        /// <param name="variablename"></param>
+        /// <param name="array"></param>
+        static public void ExportLogArray<TYPE>(string variablename, TYPE[] array)
+        {
+            ExportLogString(variablename, Array2CSV(array));
+        }
+
+        #endregion
+
+        //////////////////////////////////////////////////////////
         ////////////////////// Other Stuff ///////////////////////
         //////////////////////////////////////////////////////////
         #region Other Stuff
